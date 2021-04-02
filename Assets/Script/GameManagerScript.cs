@@ -104,29 +104,35 @@ public class GameManagerScript : MonoBehaviour
         }
         if(Turn == 1)
         {
+            FirstText.color = Color.red;
             timer -= Time.deltaTime;
             if(timer <0)
             {
                 FirstEnemy();
                 timer = timerBegin;
+                FirstText.color = Color.white;
             }
         }
         if(Turn == 2)
         {
+            SecondText.color = Color.red;
             timer -= Time.deltaTime;
             if (timer < 0)
             {
                 SecondEnemy();
                 timer = timerBegin;
+                SecondText.color = Color.white;
             }
         }
         if(Turn == 3)
         {
+            ThirdText.color = Color.red;
             timer -= Time.deltaTime;
             if (timer < 0)
             {
                 ThirdEnemy();
                 timer = timerBegin;
+                ThirdText.color = Color.white;
                 Road++;
             }
         }
@@ -148,7 +154,8 @@ public class GameManagerScript : MonoBehaviour
         int Assassin = 0;
         for (int i = 0; i < CurrentGame.SecondEnemyHand.Count; i++)
         {
-            if (CurrentGame.SecondEnemyHand[i].Race == battle.Race && CurrentGame.SecondEnemyHand[i].ForceCard == 1 && battle.ForceCard == 6 ||
+            if (CurrentGame.SecondEnemyHand[i].Race == 4 || CurrentGame.SecondEnemyHand[i].Race == 5 || battle.Race == 4 || battle.Race == 5||
+                CurrentGame.SecondEnemyHand[i].Race == battle.Race && CurrentGame.SecondEnemyHand[i].ForceCard == 1 && battle.ForceCard == 6 ||
                 CurrentGame.SecondEnemyHand[i].Race == battle.Race && CurrentGame.SecondEnemyHand[i].ForceCard ==6 && battle.ForceCard != 1 &&
                 CurrentGame.SecondEnemyHand[i].ForceCard > battle.ForceCard ||
                 CurrentGame.SecondEnemyHand[i].Race == battle.Race && CurrentGame.SecondEnemyHand[i].ForceCard !=6 && CurrentGame.SecondEnemyHand[i].ForceCard > battle.ForceCard||
@@ -161,11 +168,21 @@ public class GameManagerScript : MonoBehaviour
                 {
                     SpecCard(2);
                 }
-                else if(CurrentGame.SecondEnemyHand[i].Specialization == 4)
+                else if(CurrentGame.SecondEnemyHand[i].Specialization == 4 && CurrentGame.SecondEnemyHand[i].Race < 4)
                 {
                     AssassinCard(2);
                     Assassin++;
                 }
+
+                if(CurrentGame.SecondEnemyHand[i].Race == 4)
+                {
+                    MegaCard(2,2);
+                }
+                else if(CurrentGame.SecondEnemyHand[i].Race == 5)
+                {
+                    MegaCard(2, 4);
+                }
+
                 battle.Race = CurrentGame.SecondEnemyHand[i].Race;
                 battle.BattleImage.sprite = CurrentGame.SecondEnemyHand[i].Logo;
                 battle.ForceCard = CurrentGame.SecondEnemyHand[i].ForceCard;
@@ -204,7 +221,8 @@ public class GameManagerScript : MonoBehaviour
         int Assassin = 0;
         for (int i = 0; i < CurrentGame.FirstEnemyHand.Count; i++)
         {
-            if (CurrentGame.FirstEnemyHand[i].Race == battle.Race && CurrentGame.FirstEnemyHand[i].ForceCard == 1 && battle.ForceCard == 6 ||
+            if (CurrentGame.FirstEnemyHand[i].Race == 4 || CurrentGame.FirstEnemyHand[i].Race == 5 || battle.Race == 4 || battle.Race == 5||
+                CurrentGame.FirstEnemyHand[i].Race == battle.Race && CurrentGame.FirstEnemyHand[i].ForceCard == 1 && battle.ForceCard == 6 ||
                 CurrentGame.FirstEnemyHand[i].Race == battle.Race && CurrentGame.FirstEnemyHand[i].ForceCard == 6 && battle.ForceCard != 1 &&
                 CurrentGame.FirstEnemyHand[i].ForceCard > battle.ForceCard ||
                 CurrentGame.FirstEnemyHand[i].Race == battle.Race && CurrentGame.FirstEnemyHand[i].ForceCard !=6 && CurrentGame.FirstEnemyHand[i].ForceCard > battle.ForceCard||
@@ -217,11 +235,21 @@ public class GameManagerScript : MonoBehaviour
                 {
                     SpecCard(1);
                 }
-                else if(CurrentGame.FirstEnemyHand[i].Specialization == 4)
+                else if(CurrentGame.FirstEnemyHand[i].Specialization == 4 && CurrentGame.FirstEnemyHand[i].Race < 4)
                 {
                     AssassinCard(1);
                     Assassin++;
                 }
+
+                if(CurrentGame.FirstEnemyHand[i].Race == 4)
+                {
+                    MegaCard(1, 2);
+                }
+                else if(CurrentGame.FirstEnemyHand[i].Race == 5)
+                {
+                    MegaCard(1, 4);
+                }
+
                 battle.Race = CurrentGame.FirstEnemyHand[i].Race;
                 battle.BattleImage.sprite = CurrentGame.FirstEnemyHand[i].Logo;
                 battle.ForceCard = CurrentGame.FirstEnemyHand[i].ForceCard;
@@ -259,7 +287,8 @@ public class GameManagerScript : MonoBehaviour
         int Assassin = 0;
         for (int i = 0; i < CurrentGame.ThirdEnemyHand.Count; i++)
         {
-            if (CurrentGame.ThirdEnemyHand[i].Race == battle.Race && CurrentGame.ThirdEnemyHand[i].ForceCard == 1 && battle.ForceCard == 6 ||
+            if (CurrentGame.ThirdEnemyHand[i].Race == 4 || CurrentGame.ThirdEnemyHand[i].Race == 5|| battle.Race == 4 || battle.Race == 5 ||
+                CurrentGame.ThirdEnemyHand[i].Race == battle.Race && CurrentGame.ThirdEnemyHand[i].ForceCard == 1 && battle.ForceCard == 6 ||
                 CurrentGame.ThirdEnemyHand[i].Race == battle.Race && CurrentGame.ThirdEnemyHand[i].ForceCard == 6 && battle.ForceCard != 1 &&
                 CurrentGame.ThirdEnemyHand[i].ForceCard > battle.ForceCard ||
                 CurrentGame.ThirdEnemyHand[i].Race == battle.Race && CurrentGame.ThirdEnemyHand[i].ForceCard !=6 && CurrentGame.ThirdEnemyHand[i].ForceCard > battle.ForceCard||
@@ -272,11 +301,21 @@ public class GameManagerScript : MonoBehaviour
                 {
                     SpecCard(3);
                 }
-                else if(CurrentGame.ThirdEnemyHand[i].Specialization == 4)
+                else if(CurrentGame.ThirdEnemyHand[i].Specialization == 4 && CurrentGame.ThirdEnemyHand[i].Race < 4)
                 {
                     AssassinCard(3);
                     Assassin++;
                 }
+
+                if(CurrentGame.ThirdEnemyHand[i].Race == 4)
+                {
+                    MegaCard(3, 2);
+                }
+                else if(CurrentGame.ThirdEnemyHand[i].Race == 5)
+                {
+                    MegaCard(3, 4);
+                }
+
                 battle.Race = CurrentGame.ThirdEnemyHand[i].Race;
                 battle.BattleImage.sprite = CurrentGame.ThirdEnemyHand[i].Logo;
                 battle.ForceCard = CurrentGame.ThirdEnemyHand[i].ForceCard;
@@ -428,7 +467,7 @@ public class GameManagerScript : MonoBehaviour
         }
     }
 
-    private void AssassinCard(int number)
+    private void AssassinCard(int number)//Реализация штрафа Ассасина
     {
         if(number == 1)
         {
@@ -469,9 +508,68 @@ public class GameManagerScript : MonoBehaviour
                 forward = true;
             }
         }
-    } //Реализация штрафа Ассасина
+    } 
 
-    public void Quit()
+    private void MegaCard(int number, int war)//Реализация штрафа легендарных карт
+    {
+        if (number == 1)
+        {
+            if (forward == true)
+            {
+                for (int i = 0; i < fine * war; i++)
+                {
+                    GiveCardToHand(PlayerDeck);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < fine * war; i++)
+                {
+                    CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
+                }
+                SecondText.text = $"{CurrentGame.SecondEnemyHand.Count}";
+            }
+        }
+        else if (number == 2)
+        {
+            if (forward == true)
+            {
+                for (int i = 0; i < fine * war; i++)
+                {
+                    CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
+                }
+                FirstText.text = $"{CurrentGame.FirstEnemyHand.Count}";
+            }
+            else
+            {
+                for (int i = 0; i < fine * war; i++)
+                {
+                    CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
+                }
+                ThirdText.text = $"{CurrentGame.ThirdEnemyHand.Count}";
+            }
+        }
+        else if (number == 3)
+        {
+            if (forward == true)
+            {
+                for (int i = 0; i < fine * war; i++)
+                {
+                    CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
+                }
+                SecondText.text = $"{CurrentGame.SecondEnemyHand.Count}";
+            }
+            else
+            {
+                for (int i = 0; i < fine * war; i++)
+                {
+                    GiveCardToHand(PlayerDeck);
+                }
+            }
+        }
+    }
+
+    public void Quit()//Выход из игры
     {
         Application.Quit();
     }

@@ -73,16 +73,24 @@ public class CardScript : MonoBehaviour
                     {
                         SpecCard();
                     }
-                    else if(Specialization == 4)
+                    else if(Specialization == 4 && Race < 4)
                     {
                         AssassinCard();
+                    }
+                    if(Race == 4)
+                    {
+                        MegaCard(2);
+                    }
+                    else if(Race == 5)
+                    {
+                        MegaCard(4);
                     }
                     BattleCard.BattleImage.sprite = CardImage.sprite;
                     BattleCard.BattleImage.color = new Color(1, 1, 1, 1);
                     BattleCard.Race = Race;
                     BattleCard.Specialization = Specialization;
                     BattleCard.ForceCard = ForceCard;
-                    if (Specialization != 4)
+                    if (Specialization != 4 && Race < 4)
                     {
                         game.ChangeTurn();
                     }
@@ -215,4 +223,24 @@ public class CardScript : MonoBehaviour
             game.forward = true;
         }
     }
+
+    private void MegaCard(int number) //Реализация штрафа легендарных карт
+    {
+        if(game.forward == true)
+        {
+            for(int i = 0; i< game.fine * number;i++)
+            {
+                game.CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
+            }
+            game.ThirdText.text = $"{game.CurrentGame.ThirdEnemyHand.Count}";
+        }
+        else
+        {
+            for (int i = 0; i < game.fine * number; i++)
+            {
+               game.CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
+            }
+            game.FirstText.text = $"{game.CurrentGame.FirstEnemyHand.Count}";
+        }
+    } 
 }

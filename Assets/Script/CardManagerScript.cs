@@ -74,13 +74,13 @@ public class CardManagerScript : MonoBehaviour
             {
                 count = 4;
                 CardManager.AllCards.Add(new Card(CardVariation[i], count, 0, 0));
-                //Debug.Log($" Номер {i} Картинка {CardVariation[i].name} Раса {count} Сила {number} сециализация {spec}");
+                Debug.Log($" Номер {i} Картинка {CardVariation[i].name} Раса {count} Сила {number} сециализация {spec}");
             }
             else if (i == CardVariation.Length - 1)
             {
                 count = 5;
                 CardManager.AllCards.Add(new Card(CardVariation[i], count, 0, 0));
-                //Debug.Log($" Номер {i} Картинка {CardVariation[i].name} Раса {count} Сила {number} сециализация {spec}"); 
+                Debug.Log($" Номер {i} Картинка {CardVariation[i].name} Раса {count} Сила {number} сециализация {spec}");
             }
         }
         #endregion
