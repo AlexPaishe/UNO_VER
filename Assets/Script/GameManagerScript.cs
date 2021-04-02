@@ -45,6 +45,7 @@ public class GameManagerScript : MonoBehaviour
     public Text ThirdText; // Количество карт третьего врага 
     public int Road = 1; // Количество кругов
     public int fine = 1; // Штраф за пробитие специализации
+    public int assassinStart; //Круг с которого появляются Ассассины
 
     void Start()
     {
@@ -97,7 +98,7 @@ public class GameManagerScript : MonoBehaviour
         {
             for(int i = 0;i<CurrentGame.PlayerHand.Count;i++)
             {
-                Debug.Log(CurrentGame.PlayerHand[i].Logo);
+                //Debug.Log(CurrentGame.PlayerHand[i].Logo);
             }
             PlayerCard();
         }
@@ -144,6 +145,7 @@ public class GameManagerScript : MonoBehaviour
     private void SecondEnemy() // Реализация ИИ Второго игрока
     {
         int count = 0;
+        int Assassin = 0;
         for (int i = 0; i < CurrentGame.SecondEnemyHand.Count; i++)
         {
             if (CurrentGame.SecondEnemyHand[i].Race == battle.Race && CurrentGame.SecondEnemyHand[i].ForceCard == 1 && battle.ForceCard == 6 ||
@@ -158,6 +160,11 @@ public class GameManagerScript : MonoBehaviour
                     CurrentGame.SecondEnemyHand[i].Specialization == 3 && battle.Specialization == 2)
                 {
                     SpecCard(2);
+                }
+                else if(CurrentGame.SecondEnemyHand[i].Specialization == 4)
+                {
+                    AssassinCard(2);
+                    Assassin++;
                 }
                 battle.Race = CurrentGame.SecondEnemyHand[i].Race;
                 battle.BattleImage.sprite = CurrentGame.SecondEnemyHand[i].Logo;
@@ -174,7 +181,7 @@ public class GameManagerScript : MonoBehaviour
         {
             for (int i = 0; i < fine; i++)
             {
-                if (Road < 8)
+                if (Road < assassinStart)
                 {
                     CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
                 }
@@ -184,13 +191,17 @@ public class GameManagerScript : MonoBehaviour
                 }
             }
         }
-        ChangeTurn();
+        if (Assassin == 0)
+        {
+            ChangeTurn();
+        }
         SecondText.text = $"{CurrentGame.SecondEnemyHand.Count}";
     }
 
     private void FirstEnemy() //Реализация ИИ Первого Игрока
     {
         int count = 0;
+        int Assassin = 0;
         for (int i = 0; i < CurrentGame.FirstEnemyHand.Count; i++)
         {
             if (CurrentGame.FirstEnemyHand[i].Race == battle.Race && CurrentGame.FirstEnemyHand[i].ForceCard == 1 && battle.ForceCard == 6 ||
@@ -206,6 +217,11 @@ public class GameManagerScript : MonoBehaviour
                 {
                     SpecCard(1);
                 }
+                else if(CurrentGame.FirstEnemyHand[i].Specialization == 4)
+                {
+                    AssassinCard(1);
+                    Assassin++;
+                }
                 battle.Race = CurrentGame.FirstEnemyHand[i].Race;
                 battle.BattleImage.sprite = CurrentGame.FirstEnemyHand[i].Logo;
                 battle.ForceCard = CurrentGame.FirstEnemyHand[i].ForceCard;
@@ -220,7 +236,7 @@ public class GameManagerScript : MonoBehaviour
         {
             for (int i = 0; i < fine; i++)
             {
-                if (Road < 8)
+                if (Road < assassinStart)
                 {
                     CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
                 }
@@ -230,13 +246,17 @@ public class GameManagerScript : MonoBehaviour
                 }
             }
         }
-        ChangeTurn();
+        if (Assassin == 0)
+        {
+            ChangeTurn();
+        }
         FirstText.text = $"{CurrentGame.FirstEnemyHand.Count}";
     }
 
     private void ThirdEnemy() // Реализаця ИИ Третьего Игрока
     {
         int count = 0;
+        int Assassin = 0;
         for (int i = 0; i < CurrentGame.ThirdEnemyHand.Count; i++)
         {
             if (CurrentGame.ThirdEnemyHand[i].Race == battle.Race && CurrentGame.ThirdEnemyHand[i].ForceCard == 1 && battle.ForceCard == 6 ||
@@ -252,6 +272,11 @@ public class GameManagerScript : MonoBehaviour
                 {
                     SpecCard(3);
                 }
+                else if(CurrentGame.ThirdEnemyHand[i].Specialization == 4)
+                {
+                    AssassinCard(3);
+                    Assassin++;
+                }
                 battle.Race = CurrentGame.ThirdEnemyHand[i].Race;
                 battle.BattleImage.sprite = CurrentGame.ThirdEnemyHand[i].Logo;
                 battle.ForceCard = CurrentGame.ThirdEnemyHand[i].ForceCard;
@@ -266,7 +291,7 @@ public class GameManagerScript : MonoBehaviour
         {
             for (int i = 0; i < fine; i++)
             {
-                if (Road < 8)
+                if (Road < assassinStart)
                 {
                     CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
                 }
@@ -276,7 +301,10 @@ public class GameManagerScript : MonoBehaviour
                 }
             }
         }
-        ChangeTurn();
+        if (Assassin == 0)
+        {
+            ChangeTurn();
+        }
         ThirdText.text = $"{CurrentGame.ThirdEnemyHand.Count}";
     }
 
@@ -308,7 +336,7 @@ public class GameManagerScript : MonoBehaviour
         }
     }
 
-    private void Restart() // Реализация Переигрывания партии
+    public void Restart() // Реализация Переигрывания партии
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
@@ -328,7 +356,7 @@ public class GameManagerScript : MonoBehaviour
             {
                 for (int i = 0; i < fine; i++)
                 {
-                    if (Road < 12)
+                    if (Road < assassinStart)
                     {
                         CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
                     }
@@ -346,7 +374,7 @@ public class GameManagerScript : MonoBehaviour
             {
                 for (int i = 0; i < fine; i++)
                 {
-                    if (Road < 12)
+                    if (Road < assassinStart)
                     {
                         CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
                     }
@@ -361,7 +389,7 @@ public class GameManagerScript : MonoBehaviour
             {
                 for (int i = 0; i < fine; i++)
                 {
-                    if (Road < 12)
+                    if (Road < assassinStart)
                     {
                         CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
                     }
@@ -379,7 +407,7 @@ public class GameManagerScript : MonoBehaviour
             {
                 for (int i = 0; i < fine; i++)
                 {
-                    if (Road < 12)
+                    if (Road < assassinStart)
                     {
                         CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
                     }
@@ -398,5 +426,53 @@ public class GameManagerScript : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void AssassinCard(int number)
+    {
+        if(number == 1)
+        {
+            if(forward == true)
+            {
+                Turn = 3;
+                forward = false;
+            }
+            else
+            {
+                Turn = 3;
+                forward = true;
+            }
+        }
+        else if (number == 2)
+        {
+            if (forward == true)
+            {
+                Turn = 0;
+                forward = false;
+            }
+            else
+            {
+                Turn = 0;
+                forward = true;
+            }
+        }
+        else if(number == 3)
+        {
+            if (forward == true)
+            {
+                Turn = 1;
+                forward = false;
+            }
+            else
+            {
+                Turn = 1;
+                forward = true;
+            }
+        }
+    } //Реализация штрафа Ассасина
+
+    public void Quit()
+    {
+        Application.Quit();
     }
 }

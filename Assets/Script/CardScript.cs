@@ -30,7 +30,7 @@ public class CardScript : MonoBehaviour
         game = FindObjectOfType<GameManagerScript>();
 
         #region Присваивание рандомного значения карты, в зависимости от хода и введение ее в список руки игрока
-        if (game.Road < 8)
+        if (game.Road < game.assassinStart)
         {
             ShowCardInfo(CardManager.AllCards[Random.Range(0, cardMan.CardVariation.Length - 20)]);
         }
@@ -82,7 +82,10 @@ public class CardScript : MonoBehaviour
                     BattleCard.Race = Race;
                     BattleCard.Specialization = Specialization;
                     BattleCard.ForceCard = ForceCard;
-                    game.ChangeTurn();
+                    if (Specialization != 4)
+                    {
+                        game.ChangeTurn();
+                    }
                     //Debug.Log($" Раса {BattleCard.Race} Сила {BattleCard.ForceCard} картинка {BattleCard.BattleImage.sprite.name}");
                     for(int i = 0;i<game.CurrentGame.PlayerHand.Count;i++)
                     {
@@ -163,7 +166,7 @@ public class CardScript : MonoBehaviour
         {
             for (int i = 0; i < game.fine; i++)
             {
-                if (game.Road < 12)
+                if (game.Road < game.assassinStart)
                 {
                     game.CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
                 }
@@ -178,7 +181,7 @@ public class CardScript : MonoBehaviour
         {
             for (int i = 0; i < game.fine; i++)
             {
-                if (game.Road < 12)
+                if (game.Road < game.assassinStart)
                 {
                     game.CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
                 }
