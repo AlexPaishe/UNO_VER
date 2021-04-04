@@ -23,7 +23,7 @@ public class Game
         List<Card> list = new List<Card>();
         for(int i = 0; i<7;i++)
         {
-            list.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count-20)]);
+            list.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
         }
         return list;
     }
@@ -36,6 +36,8 @@ public class GameManagerScript : MonoBehaviour
     public GameObject CardPref; //Префаб карты
     public bool forward = true; //Направление движения круга
     public int Turn = 0; // Чья очередь играть
+    public int HotCard = 4; // Чья карта на столе
+    public int SaveCard = 4; // Кто последний взял карту
     private BattleCardScript battle; // Карты сброса
     public float timerBegin; // Время на обдумывание врагов
     private float timer; // таймер на обдумывание врагов
@@ -43,32 +45,42 @@ public class GameManagerScript : MonoBehaviour
     public Text FirstText; // Количество карт первого врага
     public Text SecondText; // Количесво карт второго врага
     public Text ThirdText; // Количество карт третьего врага 
+    public Text[] PlusText;//Количество прибавляемых карт
+    public int [] plusCard;//Количество получаемых карт
     public int Road = 1; // Количество кругов
     public int fine = 1; // Штраф за пробитие специализации
     public int assassinStart; //Круг с которого появляются Ассассины
+    private HorizontalLayoutGroup hor;// Переменная компонента раставляющие карты
 
     void Start()
     {
         CurrentGame = new Game();
 
-        GiveHandCards(CurrentGame.PlayerHand, PlayerDeck);
+        GiveHandCards();
 
         battle = FindObjectOfType<BattleCardScript>();
 
         timer = timerBegin;
-    }
 
-    private void GiveHandCards(List<Card> deck, Transform hand) // РЕализация появление начальных карт в руке Игрока
-    {
-        for(int i = 0;i<7;i++)
+        hor = FindObjectOfType<HorizontalLayoutGroup>();
+
+        for(int i = 0; i< plusCard.Length;i++)
         {
-            GiveCardToHand(hand);
+            plusCard[i] = 0;
         }
     }
 
-    private void GiveCardToHand (Transform hand)// Реализация появления карты в руке Игрока
+    private void GiveHandCards() // РЕализация появление начальных карт в руке Игрока
     {
-        GameObject cardGo = Instantiate(CardPref, hand, false);
+        for(int i = 0;i<7;i++)
+        {
+            GiveCardToHand();
+        }
+    }
+
+    public void GiveCardToHand()// Реализация появления карты в руке Игрока
+    {
+        GameObject cardGo = Instantiate(CardPref, PlayerDeck, false);
     }
 
     public void ChangeTurn()//РЕализация движение круга
@@ -104,6 +116,7 @@ public class GameManagerScript : MonoBehaviour
         }
         if(Turn == 1)
         {
+            hor.enabled = true;
             FirstText.color = Color.red;
             timer -= Time.deltaTime;
             if(timer <0)
@@ -115,6 +128,7 @@ public class GameManagerScript : MonoBehaviour
         }
         if(Turn == 2)
         {
+            hor.enabled = true;
             SecondText.color = Color.red;
             timer -= Time.deltaTime;
             if (timer < 0)
@@ -126,6 +140,7 @@ public class GameManagerScript : MonoBehaviour
         }
         if(Turn == 3)
         {
+            hor.enabled = true;
             ThirdText.color = Color.red;
             timer -= Time.deltaTime;
             if (timer < 0)
@@ -173,14 +188,20 @@ public class GameManagerScript : MonoBehaviour
                     AssassinCard(2);
                     Assassin++;
                 }
+                else if(CurrentGame.SecondEnemyHand[i].Specialization < 4 && CurrentGame.SecondEnemyHand[i].Race < 4)
+                {
+                    HotCard = 2;
+                }
 
                 if(CurrentGame.SecondEnemyHand[i].Race == 4)
                 {
-                    MegaCard(2,2);
+                    MegaCard(2);
+                    HotCard = 2;
                 }
                 else if(CurrentGame.SecondEnemyHand[i].Race == 5)
                 {
-                    MegaCard(2, 4);
+                    MegaCard(4);
+                    HotCard = 2;
                 }
 
                 battle.Race = CurrentGame.SecondEnemyHand[i].Race;
@@ -206,7 +227,10 @@ public class GameManagerScript : MonoBehaviour
                 {
                     CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
                 }
+                plusCard[2]++;
             }
+            PlusText[2].text = $"+{plusCard[2]}";
+            SaveCard = 2;
         }
         if (Assassin == 0)
         {
@@ -240,14 +264,20 @@ public class GameManagerScript : MonoBehaviour
                     AssassinCard(1);
                     Assassin++;
                 }
+                else if (CurrentGame.FirstEnemyHand[i].Specialization < 4 && CurrentGame.FirstEnemyHand[i].Race < 4)
+                {
+                    HotCard = 1;
+                }
 
                 if(CurrentGame.FirstEnemyHand[i].Race == 4)
                 {
-                    MegaCard(1, 2);
+                    MegaCard(2);
+                    HotCard = 1;
                 }
                 else if(CurrentGame.FirstEnemyHand[i].Race == 5)
                 {
-                    MegaCard(1, 4);
+                    MegaCard(4);
+                    HotCard = 1;
                 }
 
                 battle.Race = CurrentGame.FirstEnemyHand[i].Race;
@@ -272,7 +302,10 @@ public class GameManagerScript : MonoBehaviour
                 {
                     CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
                 }
+                plusCard[1]++;
             }
+            SaveCard = 1;
+            PlusText[1].text = $"+{plusCard[1]}";
         }
         if (Assassin == 0)
         {
@@ -306,14 +339,20 @@ public class GameManagerScript : MonoBehaviour
                     AssassinCard(3);
                     Assassin++;
                 }
+                else if(CurrentGame.ThirdEnemyHand[i].Specialization < 4 && CurrentGame.ThirdEnemyHand[i].Race < 4)
+                {
+                    HotCard = 3;
+                }
 
                 if(CurrentGame.ThirdEnemyHand[i].Race == 4)
                 {
-                    MegaCard(3, 2);
+                    MegaCard(2);
+                    HotCard = 3;
                 }
                 else if(CurrentGame.ThirdEnemyHand[i].Race == 5)
                 {
-                    MegaCard(3, 4);
+                    MegaCard(4);
+                    HotCard = 3;
                 }
 
                 battle.Race = CurrentGame.ThirdEnemyHand[i].Race;
@@ -338,7 +377,10 @@ public class GameManagerScript : MonoBehaviour
                 {
                     CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
                 }
+                plusCard[3]++;
             }
+            SaveCard = 3;
+            PlusText[3].text = $"+{plusCard[3]}";
         }
         if (Assassin == 0)
         {
@@ -364,12 +406,16 @@ public class GameManagerScript : MonoBehaviour
                 count++;
             }
         }
-        Debug.Log($"Круг {Road} число карт {count}");
+        //Debug.Log($"Круг {Road} число карт {count}");
         if (count == 0)
         {
+            hor.enabled = true;
             for (int i = 0; i < fine; i++)
             {
-                GiveCardToHand(PlayerDeck);
+                GiveCardToHand();
+                plusCard[0]++;
+                PlusText[0].text = $"+{plusCard[0]}";
+                SaveCard = 0;
             }
             ChangeTurn();
         }
@@ -382,89 +428,71 @@ public class GameManagerScript : MonoBehaviour
 
     private void SpecCard(int number) // Реализация получения карт при пробитии специализации
     {
-        if(number == 1)
+        if(HotCard == 0)
         {
-            if(forward == true)
+            for (int i = 0; i < fine; i++)
             {
-                for (int i = 0; i < fine; i++)
-                {
-                    GiveCardToHand(PlayerDeck);
-                }
+                GiveCardToHand();
+                plusCard[0]++;
             }
-            else
-            {
-                for (int i = 0; i < fine; i++)
-                {
-                    if (Road < assassinStart)
-                    {
-                        CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
-                    }
-                    else
-                    {
-                        CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                    }
-                }
-                SecondText.text = $"{CurrentGame.SecondEnemyHand.Count}";
-            }
+            PlusText[0].text = $"+{plusCard[0]}";
         }
-        else if (number == 2)
+        else if (HotCard == 1)
         {
-            if (forward == true)
+            for (int i = 0; i < fine; i++)
             {
-                for (int i = 0; i < fine; i++)
+                if (Road < assassinStart)
                 {
-                    if (Road < assassinStart)
-                    {
-                        CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
-                    }
-                    else
-                    {
-                        CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                    }
+                    CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
                 }
-                FirstText.text = $"{CurrentGame.FirstEnemyHand.Count}";
-            }
-            else
-            {
-                for (int i = 0; i < fine; i++)
+                else
                 {
-                    if (Road < assassinStart)
-                    {
-                        CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
-                    }
-                    else
-                    {
-                        CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                    }
+                    CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
                 }
-                ThirdText.text = $"{CurrentGame.ThirdEnemyHand.Count}";
+                plusCard[1]++;
             }
+            FirstText.text = $"{CurrentGame.FirstEnemyHand.Count}";
+            PlusText[1].text = $"+{plusCard[1]}";
         }
-        else if(number == 3)
+        else if(HotCard == 2)
         {
-            if(forward == true)
+            for (int i = 0; i < fine; i++)
             {
-                for (int i = 0; i < fine; i++)
+                if (Road < assassinStart)
                 {
-                    if (Road < assassinStart)
-                    {
-                        CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
-                    }
-                    else
-                    {
-                        CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                    }
+                    CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
                 }
-                SecondText.text = $"{CurrentGame.SecondEnemyHand.Count}";
-            }
-            else
-            {
-                for (int i = 0; i < fine; i++)
+                else
                 {
-                    GiveCardToHand(PlayerDeck);
+                    CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
                 }
+                plusCard[2]++;
             }
+            SecondText.text = $"{CurrentGame.SecondEnemyHand.Count}";
+            PlusText[2].text = $"+{plusCard[2]}";
         }
+        else if (HotCard == 3)
+        {
+            for (int i = 0; i < fine; i++)
+            {
+                if (Road < assassinStart)
+                {
+                    CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
+                }
+                else
+                {
+                    CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
+                }
+                plusCard[3]++;
+            }
+            ThirdText.text = $"{CurrentGame.ThirdEnemyHand.Count}";
+            PlusText[3].text = $"+{plusCard[3]}";
+        }
+        else if (HotCard == 4)
+        {
+
+        }
+        HotCard = number;
     }
 
     private void AssassinCard(int number)//Реализация штрафа Ассасина
@@ -481,6 +509,7 @@ public class GameManagerScript : MonoBehaviour
                 Turn = 3;
                 forward = true;
             }
+            HotCard = number;
         }
         else if (number == 2)
         {
@@ -494,6 +523,7 @@ public class GameManagerScript : MonoBehaviour
                 Turn = 0;
                 forward = true;
             }
+            HotCard = number;
         }
         else if(number == 3)
         {
@@ -507,65 +537,54 @@ public class GameManagerScript : MonoBehaviour
                 Turn = 1;
                 forward = true;
             }
+            HotCard = number;
         }
     } 
 
-    private void MegaCard(int number, int war)//Реализация штрафа легендарных карт
+    private void MegaCard(int war)//Реализация штрафа легендарных карт
     {
-        if (number == 1)
+        if (HotCard == 0)
         {
-            if (forward == true)
+            for (int i = 0; i < fine * war; i++)
             {
-                for (int i = 0; i < fine * war; i++)
-                {
-                    GiveCardToHand(PlayerDeck);
-                }
+                GiveCardToHand();
+                plusCard[0]++;
             }
-            else
-            {
-                for (int i = 0; i < fine * war; i++)
-                {
-                    CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                }
-                SecondText.text = $"{CurrentGame.SecondEnemyHand.Count}";
-            }
+            PlusText[0].text = $"+{plusCard[0]}";
         }
-        else if (number == 2)
+        else if (HotCard == 1)
         {
-            if (forward == true)
+            for (int i = 0; i < fine * war; i++)
             {
-                for (int i = 0; i < fine * war; i++)
-                {
-                    CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                }
-                FirstText.text = $"{CurrentGame.FirstEnemyHand.Count}";
+                CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
+                plusCard[1]++;
             }
-            else
-            {
-                for (int i = 0; i < fine * war; i++)
-                {
-                    CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                }
-                ThirdText.text = $"{CurrentGame.ThirdEnemyHand.Count}";
-            }
+            FirstText.text = $"{CurrentGame.FirstEnemyHand.Count}";
+            PlusText[1].text = $"+{plusCard[1]}";
         }
-        else if (number == 3)
+        else if (HotCard == 2)
         {
-            if (forward == true)
+            for (int i = 0; i < fine * war; i++)
             {
-                for (int i = 0; i < fine * war; i++)
-                {
-                    CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                }
-                SecondText.text = $"{CurrentGame.SecondEnemyHand.Count}";
+                CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
+                plusCard[2]++;
             }
-            else
+            SecondText.text = $"{CurrentGame.SecondEnemyHand.Count}";
+            PlusText[2].text = $"+{plusCard[2]}";
+        }
+        else if (HotCard == 3)
+        {
+            for (int i = 0; i < fine * war; i++)
             {
-                for (int i = 0; i < fine * war; i++)
-                {
-                    GiveCardToHand(PlayerDeck);
-                }
+                CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
+                plusCard[3]++;
             }
+            ThirdText.text = $"{CurrentGame.ThirdEnemyHand.Count}";
+            PlusText[3].text = $"+{plusCard[3]}";
+        }
+        else if (HotCard == 4)
+        {
+
         }
     }
 

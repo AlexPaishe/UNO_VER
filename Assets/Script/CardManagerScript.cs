@@ -36,9 +36,9 @@ public class CardManagerScript : MonoBehaviour
         int spec = 1;
         for (int i = 0; i < CardVariation.Length; i++)
         {
-            if (i < spec * 18 && spec<5 && i<CardVariation.Length-2)
+            if (i < spec * 18 && spec < 5 && i < CardVariation.Length - 2)
             {
-                if (i < (count * 6)+((spec - 1) * 18))
+                if (i < (count * 6) + ((spec - 1) * 18))
                 {
                     if (count == 1)
                     {
@@ -53,7 +53,7 @@ public class CardManagerScript : MonoBehaviour
                         //Debug.Log($" Номер {i} Картинка {CardVariation[i].name} Раса {count} Сила {number} сециализация {spec}");
                     }
                 }
-                else if (i == (count * 6) +((spec - 1) * 18))
+                else if (i == (count * 6) + ((spec - 1) * 18))
                 {
                     count++;
                     number = 1;
@@ -61,7 +61,7 @@ public class CardManagerScript : MonoBehaviour
                     //Debug.Log($" Номер {i} Картинка {CardVariation[i].name} Раса {count} Сила {number} сециализация {spec}");
                 }
             }
-            else if(i == spec * 18 && spec<5 && i < CardVariation.Length - 2)
+            else if (i == spec * 18 && spec < 5 && i < CardVariation.Length - 2)
             {
                 count = 1;
                 number = 1;
