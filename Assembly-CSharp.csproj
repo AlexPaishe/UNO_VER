@@ -67,6 +67,8 @@
     <Compile Include="Assets\Script\CardManagerScript.cs" />
     <Compile Include="Assets\Script\CardScript.cs" />
     <Compile Include="Assets\Script\GameManagerScript.cs" />
+    <Compile Include="Assets\Script\GrandMenuScript.cs" />
+    <Compile Include="Assets\Script\SoundScript.cs" />
     <Compile Include="Assets\Script\UIManagerScript.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/Unity_project/UNOMagicCard/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>

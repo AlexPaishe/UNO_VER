@@ -49,8 +49,9 @@ public class GameManagerScript : MonoBehaviour
     public int [] plusCard;//Количество получаемых карт
     public int Road = 1; // Количество кругов
     public int fine = 1; // Штраф за пробитие специализации
-    public int assassinStart; //Круг с которого появляются Ассассины
     private HorizontalLayoutGroup hor;// Переменная компонента раставляющие карты
+    private SoundScript Sound;//Звуки
+    public bool go = true;//Могут ли враги играть
 
     void Start()
     {
@@ -63,6 +64,8 @@ public class GameManagerScript : MonoBehaviour
         timer = timerBegin;
 
         hor = FindObjectOfType<HorizontalLayoutGroup>();
+
+        Sound = FindObjectOfType<SoundScript>();
 
         for(int i = 0; i< plusCard.Length;i++)
         {
@@ -106,60 +109,55 @@ public class GameManagerScript : MonoBehaviour
     private void Update()
     {
         #region Реализация времени на обдумывания игроков и получение карт при отсутствия возможности играть
-        if (Turn == 0)
+        if (go == true)
         {
-            for(int i = 0;i<CurrentGame.PlayerHand.Count;i++)
+            if (Turn == 0)
             {
-                //Debug.Log(CurrentGame.PlayerHand[i].Logo);
+                for (int i = 0; i < CurrentGame.PlayerHand.Count; i++)
+                {
+                    //Debug.Log(CurrentGame.PlayerHand[i].Logo);
+                }
+                PlayerCard();
             }
-            PlayerCard();
-        }
-        if(Turn == 1)
-        {
-            hor.enabled = true;
-            FirstText.color = Color.red;
-            timer -= Time.deltaTime;
-            if(timer <0)
+            if (Turn == 1)
             {
-                FirstEnemy();
-                timer = timerBegin;
-                FirstText.color = Color.white;
+                hor.enabled = true;
+                FirstText.color = Color.red;
+                timer -= Time.deltaTime;
+                if (timer < 0)
+                {
+                    FirstEnemy();
+                    timer = timerBegin;
+                    FirstText.color = Color.white;
+                }
             }
-        }
-        if(Turn == 2)
-        {
-            hor.enabled = true;
-            SecondText.color = Color.red;
-            timer -= Time.deltaTime;
-            if (timer < 0)
+            if (Turn == 2)
             {
-                SecondEnemy();
-                timer = timerBegin;
-                SecondText.color = Color.white;
+                hor.enabled = true;
+                SecondText.color = Color.red;
+                timer -= Time.deltaTime;
+                if (timer < 0)
+                {
+                    SecondEnemy();
+                    timer = timerBegin;
+                    SecondText.color = Color.white;
+                }
             }
-        }
-        if(Turn == 3)
-        {
-            hor.enabled = true;
-            ThirdText.color = Color.red;
-            timer -= Time.deltaTime;
-            if (timer < 0)
+            if (Turn == 3)
             {
-                ThirdEnemy();
-                timer = timerBegin;
-                ThirdText.color = Color.white;
-                Road++;
+                hor.enabled = true;
+                ThirdText.color = Color.red;
+                timer -= Time.deltaTime;
+                if (timer < 0)
+                {
+                    ThirdEnemy();
+                    timer = timerBegin;
+                    ThirdText.color = Color.white;
+                    Road++;
+                }
             }
         }
         #endregion
-    }
-
-    private void FixedUpdate()
-    {
-        if(CurrentGame.FirstEnemyHand.Count == 0||CurrentGame.PlayerHand.Count == 0|| CurrentGame.SecondEnemyHand.Count == 0||CurrentGame.ThirdEnemyHand.Count == 0)
-        {
-            Restart();
-        }
     }
 
     #region Реализация ИИ противников
@@ -182,26 +180,29 @@ public class GameManagerScript : MonoBehaviour
                     CurrentGame.SecondEnemyHand[i].Specialization == 3 && battle.Specialization == 2)
                 {
                     SpecCard(2);
+                    SpecCardSound(2, i);
                 }
                 else if(CurrentGame.SecondEnemyHand[i].Specialization == 4 && CurrentGame.SecondEnemyHand[i].Race < 4)
                 {
                     AssassinCard(2);
                     Assassin++;
                 }
-                else if(CurrentGame.SecondEnemyHand[i].Specialization < 4 && CurrentGame.SecondEnemyHand[i].Race < 4)
-                {
-                    HotCard = 2;
-                }
-
-                if(CurrentGame.SecondEnemyHand[i].Race == 4)
+                else if(CurrentGame.SecondEnemyHand[i].Race == 4)
                 {
                     MegaCard(2);
                     HotCard = 2;
+                    LegendaryCardSound(2, i);
                 }
                 else if(CurrentGame.SecondEnemyHand[i].Race == 5)
                 {
                     MegaCard(4);
                     HotCard = 2;
+                    LegendaryCardSound(2, i);
+                }
+                else if (CurrentGame.SecondEnemyHand[i].Specialization < 4 && CurrentGame.SecondEnemyHand[i].Race < 4)
+                {
+                    HotCard = 2;
+                    Sound.AttackSound();
                 }
 
                 battle.Race = CurrentGame.SecondEnemyHand[i].Race;
@@ -210,7 +211,6 @@ public class GameManagerScript : MonoBehaviour
                 battle.Specialization = CurrentGame.SecondEnemyHand[i].Specialization;
 
                 count++;
-                //Debug.Log($" Раса {battle.Race} Сила {battle.ForceCard} картинка {battle.BattleImage.sprite.name}");
                 CurrentGame.SecondEnemyHand.RemoveAt(i);
                 break;
             }
@@ -219,14 +219,7 @@ public class GameManagerScript : MonoBehaviour
         {
             for (int i = 0; i < fine; i++)
             {
-                if (Road < assassinStart)
-                {
-                    CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
-                }
-                else
-                {
-                    CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                }
+                CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
                 plusCard[2]++;
             }
             PlusText[2].text = $"+{plusCard[2]}";
@@ -258,26 +251,29 @@ public class GameManagerScript : MonoBehaviour
                     CurrentGame.FirstEnemyHand[i].Specialization == 3 && battle.Specialization == 2)
                 {
                     SpecCard(1);
+                    SpecCardSound(1, i);
                 }
                 else if(CurrentGame.FirstEnemyHand[i].Specialization == 4 && CurrentGame.FirstEnemyHand[i].Race < 4)
                 {
                     AssassinCard(1);
                     Assassin++;
                 }
-                else if (CurrentGame.FirstEnemyHand[i].Specialization < 4 && CurrentGame.FirstEnemyHand[i].Race < 4)
-                {
-                    HotCard = 1;
-                }
-
-                if(CurrentGame.FirstEnemyHand[i].Race == 4)
+                else if(CurrentGame.FirstEnemyHand[i].Race == 4)
                 {
                     MegaCard(2);
                     HotCard = 1;
+                    LegendaryCardSound(1, i);
                 }
                 else if(CurrentGame.FirstEnemyHand[i].Race == 5)
                 {
                     MegaCard(4);
                     HotCard = 1;
+                    LegendaryCardSound(1, i);
+                }
+                else if (CurrentGame.FirstEnemyHand[i].Specialization < 4 && CurrentGame.FirstEnemyHand[i].Race < 4)
+                {
+                    HotCard = 1;
+                    Sound.AttackSound();
                 }
 
                 battle.Race = CurrentGame.FirstEnemyHand[i].Race;
@@ -285,7 +281,6 @@ public class GameManagerScript : MonoBehaviour
                 battle.ForceCard = CurrentGame.FirstEnemyHand[i].ForceCard;
                 battle.Specialization = CurrentGame.FirstEnemyHand[i].Specialization;
                 count++;
-                //Debug.Log($" Раса {battle.Race} Сила {battle.ForceCard} картинка {battle.BattleImage.sprite.name}");
                 CurrentGame.FirstEnemyHand.RemoveAt(i);
                 break;
             }
@@ -294,14 +289,7 @@ public class GameManagerScript : MonoBehaviour
         {
             for (int i = 0; i < fine; i++)
             {
-                if (Road < assassinStart)
-                {
-                    CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
-                }
-                else
-                {
-                    CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                }
+                CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
                 plusCard[1]++;
             }
             SaveCard = 1;
@@ -333,26 +321,29 @@ public class GameManagerScript : MonoBehaviour
                     CurrentGame.ThirdEnemyHand[i].Specialization == 3 && battle.Specialization == 2)
                 {
                     SpecCard(3);
+                    SpecCardSound(3, i);
                 }
                 else if(CurrentGame.ThirdEnemyHand[i].Specialization == 4 && CurrentGame.ThirdEnemyHand[i].Race < 4)
                 {
                     AssassinCard(3);
                     Assassin++;
                 }
-                else if(CurrentGame.ThirdEnemyHand[i].Specialization < 4 && CurrentGame.ThirdEnemyHand[i].Race < 4)
-                {
-                    HotCard = 3;
-                }
-
-                if(CurrentGame.ThirdEnemyHand[i].Race == 4)
+                else if(CurrentGame.ThirdEnemyHand[i].Race == 4)
                 {
                     MegaCard(2);
                     HotCard = 3;
+                    LegendaryCardSound(3, i);
                 }
                 else if(CurrentGame.ThirdEnemyHand[i].Race == 5)
                 {
                     MegaCard(4);
                     HotCard = 3;
+                    LegendaryCardSound(3, i);
+                }
+                else if (CurrentGame.ThirdEnemyHand[i].Specialization < 4 && CurrentGame.ThirdEnemyHand[i].Race < 4)
+                {
+                    HotCard = 3;
+                    Sound.AttackSound();
                 }
 
                 battle.Race = CurrentGame.ThirdEnemyHand[i].Race;
@@ -360,7 +351,6 @@ public class GameManagerScript : MonoBehaviour
                 battle.ForceCard = CurrentGame.ThirdEnemyHand[i].ForceCard;
                 battle.Specialization = CurrentGame.ThirdEnemyHand[i].Specialization;
                 count++;
-                //Debug.Log($" Раса {battle.Race} Сила {battle.ForceCard} картинка {battle.BattleImage.sprite.name}");
                 CurrentGame.ThirdEnemyHand.RemoveAt(i);
                 break;
             }
@@ -369,14 +359,7 @@ public class GameManagerScript : MonoBehaviour
         {
             for (int i = 0; i < fine; i++)
             {
-                if (Road < assassinStart)
-                {
-                    CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
-                }
-                else
-                {
-                    CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                }
+                CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
                 plusCard[3]++;
             }
             SaveCard = 3;
@@ -396,7 +379,8 @@ public class GameManagerScript : MonoBehaviour
         int count = 0;
         for (int i = 0; i < CurrentGame.PlayerHand.Count; i++)
         {
-            if (CurrentGame.PlayerHand[i].Race == battle.Race && CurrentGame.PlayerHand[i].ForceCard == 1 && battle.ForceCard == 6 ||
+            if (CurrentGame.PlayerHand[i].Race == 4 || CurrentGame.PlayerHand[i].Race == 5 || battle.Race == 4 || battle.Race == 5 ||
+                CurrentGame.PlayerHand[i].Race == battle.Race && CurrentGame.PlayerHand[i].ForceCard == 1 && battle.ForceCard == 6 ||
                 CurrentGame.PlayerHand[i].Race == battle.Race && CurrentGame.PlayerHand[i].ForceCard == 6 && battle.ForceCard != 1 &&
                 CurrentGame.PlayerHand[i].ForceCard > battle.ForceCard ||
                 CurrentGame.PlayerHand[i].Race == battle.Race && CurrentGame.PlayerHand[i].ForceCard != 6 && CurrentGame.PlayerHand[i].ForceCard > battle.ForceCard ||
@@ -441,14 +425,7 @@ public class GameManagerScript : MonoBehaviour
         {
             for (int i = 0; i < fine; i++)
             {
-                if (Road < assassinStart)
-                {
-                    CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
-                }
-                else
-                {
-                    CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                }
+                CurrentGame.FirstEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
                 plusCard[1]++;
             }
             FirstText.text = $"{CurrentGame.FirstEnemyHand.Count}";
@@ -458,14 +435,7 @@ public class GameManagerScript : MonoBehaviour
         {
             for (int i = 0; i < fine; i++)
             {
-                if (Road < assassinStart)
-                {
-                    CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
-                }
-                else
-                {
-                    CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                }
+                CurrentGame.SecondEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
                 plusCard[2]++;
             }
             SecondText.text = $"{CurrentGame.SecondEnemyHand.Count}";
@@ -475,14 +445,7 @@ public class GameManagerScript : MonoBehaviour
         {
             for (int i = 0; i < fine; i++)
             {
-                if (Road < assassinStart)
-                {
-                    CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count - 20)]);
-                }
-                else
-                {
-                    CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
-                }
+                CurrentGame.ThirdEnemyHand.Add(CardManager.AllCards[Random.Range(0, CardManager.AllCards.Count)]);
                 plusCard[3]++;
             }
             ThirdText.text = $"{CurrentGame.ThirdEnemyHand.Count}";
@@ -539,6 +502,7 @@ public class GameManagerScript : MonoBehaviour
             }
             HotCard = number;
         }
+        Sound.AssassinSound();
     } 
 
     private void MegaCard(int war)//Реализация штрафа легендарных карт
@@ -588,8 +552,89 @@ public class GameManagerScript : MonoBehaviour
         }
     }
 
-    public void Quit()//Выход из игры
+    private void LegendaryCardSound(int numberplayer, int numbercard)//Реализация звуков мега карт
     {
-        Application.Quit();
+        if(numberplayer == 1)
+        {
+            if(CurrentGame.FirstEnemyHand[numbercard].Race == 4)
+            {
+                Sound.NecramagSound();
+            }
+            else if(CurrentGame.FirstEnemyHand[numbercard].Race == 5)
+            {
+                Sound.DemiurgeSound();
+            }
+        }
+        else if(numberplayer == 2)
+        {
+            if (CurrentGame.SecondEnemyHand[numbercard].Race == 4)
+            {
+                Sound.NecramagSound();
+            }
+            else if (CurrentGame.SecondEnemyHand[numbercard].Race == 5)
+            {
+                Sound.DemiurgeSound();
+            }
+        }
+        else if(numberplayer == 3)
+        {
+            if (CurrentGame.ThirdEnemyHand[numbercard].Race == 4)
+            {
+                Sound.NecramagSound();
+            }
+            else if (CurrentGame.ThirdEnemyHand[numbercard].Race == 5)
+            {
+                Sound.DemiurgeSound();
+            }
+        }
+    }
+
+    private void SpecCardSound(int numberplayer, int numbercard)//Реализация звуков прибития специализации
+    {
+        if(numberplayer == 1)
+        {
+            if(CurrentGame.FirstEnemyHand[numbercard].Specialization == 1 && battle.Specialization == 3)
+            {
+                Sound.ArcherSound();
+            }
+            else if (CurrentGame.FirstEnemyHand[numbercard].Specialization == 2 && battle.Specialization == 1)
+            {
+                Sound.MagicianSound();
+            }
+            else if (CurrentGame.FirstEnemyHand[numbercard].Specialization == 3 && battle.Specialization == 2)
+            {
+                Sound.WarriorSound();
+            }
+        }
+        else if (numberplayer == 2)
+        {
+            if (CurrentGame.SecondEnemyHand[numbercard].Specialization == 1 && battle.Specialization == 3)
+            {
+                Sound.ArcherSound();
+            }
+            else if (CurrentGame.SecondEnemyHand[numbercard].Specialization == 2 && battle.Specialization == 1)
+            {
+                Sound.MagicianSound();
+            }
+            else if (CurrentGame.SecondEnemyHand[numbercard].Specialization == 3 && battle.Specialization == 2)
+            {
+                Sound.WarriorSound();
+            }
+        }
+        else if (numberplayer == 3)
+        {
+            if (CurrentGame.ThirdEnemyHand[numbercard].Specialization == 1 && battle.Specialization == 3)
+            {
+                Sound.ArcherSound();
+            }
+            else if (CurrentGame.ThirdEnemyHand[numbercard].Specialization == 2 && battle.Specialization == 1)
+            {
+                Sound.MagicianSound();
+            }
+            else if (CurrentGame.ThirdEnemyHand[numbercard].Specialization == 3 && battle.Specialization == 2)
+            {
+                Sound.WarriorSound();
+            }
+        }
     }
 }
