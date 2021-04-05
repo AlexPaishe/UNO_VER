@@ -49,7 +49,6 @@ public class GameManagerScript : MonoBehaviour
     public int [] plusCard;//Количество получаемых карт
     public int Road = 1; // Количество кругов
     public int fine = 1; // Штраф за пробитие специализации
-    private HorizontalLayoutGroup hor;// Переменная компонента раставляющие карты
     private SoundScript Sound;//Звуки
     public bool go = true;//Могут ли враги играть
 
@@ -62,8 +61,6 @@ public class GameManagerScript : MonoBehaviour
         battle = FindObjectOfType<BattleCardScript>();
 
         timer = timerBegin;
-
-        hor = FindObjectOfType<HorizontalLayoutGroup>();
 
         Sound = FindObjectOfType<SoundScript>();
 
@@ -121,7 +118,6 @@ public class GameManagerScript : MonoBehaviour
             }
             if (Turn == 1)
             {
-                hor.enabled = true;
                 FirstText.color = Color.red;
                 timer -= Time.deltaTime;
                 if (timer < 0)
@@ -133,7 +129,6 @@ public class GameManagerScript : MonoBehaviour
             }
             if (Turn == 2)
             {
-                hor.enabled = true;
                 SecondText.color = Color.red;
                 timer -= Time.deltaTime;
                 if (timer < 0)
@@ -145,7 +140,6 @@ public class GameManagerScript : MonoBehaviour
             }
             if (Turn == 3)
             {
-                hor.enabled = true;
                 ThirdText.color = Color.red;
                 timer -= Time.deltaTime;
                 if (timer < 0)
@@ -161,6 +155,7 @@ public class GameManagerScript : MonoBehaviour
     }
 
     #region Реализация ИИ противников
+
     private void SecondEnemy() // Реализация ИИ Второго игрока
     {
         int count = 0;
@@ -390,10 +385,8 @@ public class GameManagerScript : MonoBehaviour
                 count++;
             }
         }
-        //Debug.Log($"Круг {Road} число карт {count}");
         if (count == 0)
         {
-            hor.enabled = true;
             for (int i = 0; i < fine; i++)
             {
                 GiveCardToHand();

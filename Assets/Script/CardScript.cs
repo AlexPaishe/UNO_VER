@@ -11,8 +11,6 @@ public class CardScript : MonoBehaviour
     public int ForceCard;//Сила карты
     private BattleCardScript BattleCard;//Карты сброса
     private int click = 0;//Количество кликов на данный момент
-    public float timerBegin;//Время между кликами
-    private float timer;//таймер для реализация двойного клика
     private Image CardImage;//Картинка карты
     private bool go;//Может ли карта быть разыгранной в данный момент или нет
     public Image LightIndicator;//Подсветка карт, которая может быть разыграна
@@ -20,14 +18,14 @@ public class CardScript : MonoBehaviour
     public Card SelfCard;//Все данные карты
     private GameManagerScript game;//Менеджер игры
     private Transform DefaultParent;//Трансформ родителя
-    private HorizontalLayoutGroup hor;//переменная компонента который раставляет карты
     private Vector3 ScaleCard;//Переменная начального размера карты
     private Vector3 transformCard;//Переменная начального расположения карты
     private SoundScript Sound;//Звуки
+    public GameObject FreeCard;
+    private Vector3 TransFree;
 
     private void Start()
     {
-        timer = timerBegin;
         but = GetComponent<Button>();
         CardImage = GetComponent<Image>();
         BattleCard = FindObjectOfType<BattleCardScript>();
@@ -35,9 +33,10 @@ public class CardScript : MonoBehaviour
         CardManagerScript cardMan = FindObjectOfType<CardManagerScript>();       
         game = FindObjectOfType<GameManagerScript>();
         DefaultParent = transform.parent;
-        hor = FindObjectOfType<HorizontalLayoutGroup>();
         ScaleCard = transform.localScale;
         transformCard = transform.parent.position;
+        FreeCard = GameObject.Find("FreeCard");
+        TransFree = FreeCard.transform.position;
 
         #region Присваивание рандомного значения карты, в зависимости от хода и введение ее в список руки игрока
         ShowCardInfo(CardManager.AllCards[Random.Range(0, cardMan.CardVariation.Length)]);
@@ -95,7 +94,6 @@ public class CardScript : MonoBehaviour
                         {
                             game.ChangeTurn();
                         }
-                        //Debug.Log($" Раса {BattleCard.Race} Сила {BattleCard.ForceCard} картинка {BattleCard.BattleImage.sprite.name}");
                         for (int i = 0; i < game.CurrentGame.PlayerHand.Count; i++)
                         {
                             if (CardImage.sprite == game.CurrentGame.PlayerHand[i].Logo)
@@ -118,6 +116,8 @@ public class CardScript : MonoBehaviour
                 go = false;
                 LightIndicator.color = new Color(1, 1, 1, 0);
                 but.interactable = false;
+                FreeCard.transform.SetParent(DefaultParent.parent);
+                FreeCard.transform.localPosition = TransFree;
             }
         }
     }
@@ -298,16 +298,18 @@ public class CardScript : MonoBehaviour
     {
         if (game.Turn == 0)
         {
+            FreeCard.transform.SetParent(DefaultParent);
+            FreeCard.transform.SetSiblingIndex(transform.GetSiblingIndex());
             Vector3 UP = transform.position;
             UP.y += 50;
-            transform.position = UP;
+            transform.position = UP;           
             Vector3 ScaleUP = transform.localScale;
             ScaleUP.x *= 1.4f;
             ScaleUP.y *= 1.4f;
             transform.localScale = ScaleUP;
             Sound.SearchCardSound();
-            hor.enabled = false;
             transform.SetParent(DefaultParent.parent);
+            CheckPosition();
         }
     }
 
@@ -320,6 +322,9 @@ public class CardScript : MonoBehaviour
             transform.position = UP;
             transform.localScale = ScaleCard;
             transform.SetParent(DefaultParent);
+            transform.SetSiblingIndex(FreeCard.transform.GetSiblingIndex());
+            FreeCard.transform.SetParent(DefaultParent.parent);
+            FreeCard.transform.localPosition = TransFree;
         }
     }
 
@@ -337,5 +342,26 @@ public class CardScript : MonoBehaviour
         {
             Sound.WarriorSound();
         }
+    }
+
+    void CheckPosition()//Исправление бага, при котором в каждом ходу карты руки игрока перемешивались
+    {
+        int newIndex = DefaultParent.childCount;
+
+        for( int i = 0; i < DefaultParent.childCount; i++)
+        {
+            if(transform.position.x < DefaultParent.GetChild(i).position.x)
+            {
+                newIndex = i;
+
+                if(FreeCard.transform.GetSiblingIndex()<newIndex)
+                {
+                    newIndex--;
+                }
+                break;
+            }
+        }
+
+        FreeCard.transform.SetSiblingIndex(newIndex);
     }
 }
