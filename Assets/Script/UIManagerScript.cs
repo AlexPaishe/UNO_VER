@@ -26,6 +26,7 @@ public class UIManagerScript : MonoBehaviour
     public Slider SoundSound;//Настройка громкости звуков
     private float MusicVolume = 0;//Громкость музыки
     private float SoundVolume = 0;//Громкость звуков
+    private bool endmatch = false;
     void Start()
     {
         game = FindObjectOfType<GameManagerScript>();
@@ -180,6 +181,7 @@ public class UIManagerScript : MonoBehaviour
             game.CurrentGame.ThirdEnemyHand.Count == 0|| game.CurrentGame.PlayerHand.Count == 0)
         {
             game.go = false;
+            endmatch = true;
             End.SetActive(true);
             if(game.CurrentGame.PlayerHand.Count == 0)
             {
@@ -194,22 +196,25 @@ public class UIManagerScript : MonoBehaviour
 
     private void PauseMenu()//Реализация меню паузы
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (endmatch == false)
         {
-            PauseMenuOpen = !PauseMenuOpen;
-        }
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                PauseMenuOpen = !PauseMenuOpen;
+            }
 
-        if(PauseMenuOpen == true)
-        {
-            game.go = false;
-            Pause.SetActive(true);
+            if (PauseMenuOpen == true)
+            {
+                game.go = false;
+                Pause.SetActive(true);
+            }
+            else
+            {
+                game.go = true;
+                Pause.SetActive(false);
+                Setting.SetActive(false);
+            }
         }
-        else
-        {
-            game.go = true;
-            Pause.SetActive(false);
-            Setting.SetActive(false);
-        }          
     }
 
     public void SettingMenu()//Включение меню настроек

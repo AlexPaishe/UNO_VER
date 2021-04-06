@@ -14,10 +14,12 @@ public class GrandMenuScript : MonoBehaviour
     private float SoundVolume = 0;
     public AudioSource Music;
     public AudioSource SoundCard;
+    public Material BarMat;
     
     void Start()
     {
         anima = GetComponent<Animator>();
+        BarMat.DisableKeyword("_EMISSION");
         MusicSlider.value = MusicVolume;
         SoundSlider.value = SoundVolume;
     }
@@ -97,5 +99,15 @@ public class GrandMenuScript : MonoBehaviour
     public void SoundAction(float val)//Настройка громкости звуков
     {
         PlayerPrefs.SetFloat("SoundSound", val);
+    }
+
+    public void OnPoint()
+    {
+        BarMat.EnableKeyword("_EMISSION");
+    }
+
+    public void OffPoint()
+    {
+        BarMat.DisableKeyword("_EMISSION");
     }
 }
